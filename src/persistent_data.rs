@@ -47,8 +47,9 @@ impl RunInfo {
     // Get the directory (relative to the runs dir) that stores data specific to
     // this run.
     fn dir_name(&self) -> String {
-        let args = blake3::hash(self.args.join("_").as_bytes()).to_string();
-        self.timestamp.clone().replace(':', "-").replace('+', "_") + "_" + &args
+        let args_hash = blake3::hash(self.args.join("_").as_bytes()).to_string();
+        let short_hash = &args_hash[..8];
+        self.timestamp.clone().replace(':', "-").replace('+', "_") + "_" + short_hash
     }
 }
 
@@ -66,6 +67,7 @@ impl PersistentDataStore {
         // Now compute one specific to this lintrunner config.
         let config_path_hash =
             blake3::hash(primary_config_path.to_string_lossy().as_bytes()).to_string();
+        let config_path_hash = &config_path_hash[..8];
         let config_data_dir = project_data_dir.join(config_path_hash);
 
         // Create the runs dir as well.
