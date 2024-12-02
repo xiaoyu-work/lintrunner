@@ -173,7 +173,10 @@ fn do_main() -> Result<i32> {
 
     let run_info = RunInfo {
         args: std::env::args().collect(),
-        timestamp: chrono::Local::now().to_rfc3339_opts(SecondsFormat::Millis, true),
+        timestamp: {
+            let current_time = chrono::Local::now().to_rfc3339_opts(SecondsFormat::Millis, true);
+            blake3::hash(current_time.as_bytes()).to_string()[..4].to_string()
+        },
     };
     // clone split by commas and trim whitespace
     let config_paths: Vec<String> = args
